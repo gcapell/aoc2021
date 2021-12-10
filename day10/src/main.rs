@@ -34,23 +34,17 @@ fn score(s: &str) -> Option<u64> {
         match bracket(c) {
             Bracket::Open(_) => stack.push(c),
             Bracket::Close(opposite) => {
-                if let Some(d) = stack.pop() {
-                    if d == opposite {
-                        continue;
-                    }
+                if stack.pop() != Some(opposite) {
+                    return None;
                 }
-                return None;
             }
         }
     }
     let mut scores: Vec<u64> = stack
         .iter()
-        .map(|&c| {
-            if let Bracket::Open(n) = bracket(c) {
-                n
-            } else {
-                panic!("not open")
-            }
+        .map(|&c| match bracket(c) {
+            Bracket::Open(n) => n,
+            _ => panic!("not open"),
         })
         .collect();
     scores.reverse();
