@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 fn main() {
-    let mut edges: HashMap<String, Vec<String>> = HashMap::new();
+    let mut edges: HashMap<&str, Vec<&str>> = HashMap::new();
 
     for (a, b) in include_str!("input.txt").split_terminator('\n').map(|s| {
         let p = s.find('-').unwrap();
@@ -14,11 +14,11 @@ fn main() {
     dbg!(paths);
 }
 
-fn add(edges: &mut HashMap<String, Vec<String>>, a: &str, b: &str) {
+fn add<'a>(edges: &mut HashMap<&'a str, Vec<&'a str>>, a: &'a str, b: &'a str) {
     edges
-        .entry(a.to_owned())
+        .entry(a)
         .or_insert_with(Vec::new)
-        .push(b.to_owned());
+        .push(b);
 }
 
 struct Tracker {
@@ -66,10 +66,10 @@ fn big(s: &str) -> bool {
     s.chars().next().unwrap().is_uppercase()
 }
 
-fn dfs(edges: &HashMap<String, Vec<String>>, src: &str, tracker: &mut Tracker) -> i32 {
+fn dfs(edges: &HashMap<&str, Vec<&str>>, src: &str, tracker: &mut Tracker) -> i32 {
     let mut paths = 0;
     for e in edges.get(src).unwrap() {
-        if e == "end" {
+        if *e == "end" {
             //println!("start,{},end",tracker.path.join(","));
             paths += 1;
             continue;
