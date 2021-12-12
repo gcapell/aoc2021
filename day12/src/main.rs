@@ -15,19 +15,16 @@ fn main() {
 }
 
 fn add<'a>(edges: &mut HashMap<&'a str, Vec<&'a str>>, a: &'a str, b: &'a str) {
-    edges
-        .entry(a)
-        .or_insert_with(Vec::new)
-        .push(b);
+    edges.entry(a).or_insert_with(Vec::new).push(b);
 }
 
-struct Tracker {
-    seen: HashSet<String>,
-    doubled: Option<String>,
-    path: Vec<String>,
+struct Tracker<'a> {
+    seen: HashSet<&'a str>,
+    doubled: Option<&'a str>,
+    path: Vec<&'a str>,
 }
 
-impl Tracker {
+impl<'a> Tracker<'a> {
     fn new() -> Self {
         Self {
             seen: HashSet::new(),
@@ -36,19 +33,20 @@ impl Tracker {
         }
     }
 
-    fn push(&mut self, s: &str) {
+    fn push(&mut self, s: &'a str) {
         if !big(s) {
             if self.seen.contains(s) {
-                self.doubled = Some(s.to_string());
+                self.doubled = Some(s);
+            } else {
+                self.seen.insert(s);
             }
-            self.seen.insert(s.to_string());
         }
-        self.path.push(s.to_string());
+        self.path.push(s);
     }
 
     fn pop(&mut self, s: &str) {
         if !big(s) {
-            if self.doubled == Some(s.to_string()) {
+            if self.doubled == Some(s) {
                 self.doubled = None;
             } else {
                 self.seen.remove(s);
@@ -66,7 +64,7 @@ fn big(s: &str) -> bool {
     s.chars().next().unwrap().is_uppercase()
 }
 
-fn dfs(edges: &HashMap<&str, Vec<&str>>, src: &str, tracker: &mut Tracker) -> i32 {
+fn dfs<'a>(edges: &HashMap<&'a str, Vec<&'a str>>, src: &str, tracker: &mut Tracker<'a>) -> i32 {
     let mut paths = 0;
     for e in edges.get(src).unwrap() {
         if *e == "end" {
