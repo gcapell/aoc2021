@@ -44,23 +44,23 @@ fn main() {
         counts[pos] += 1;
     }
 
-    for _ in 0..40 {
-        counts = polymerise(counts, &insertions);
+    let mut counts2: Vec<Count> = vec![0; pairs.len()];
+    let setup_t = now.elapsed();
+    for _ in 0..20 {
+        polymerise(&counts, &mut counts2, &insertions);
+        polymerise(&counts2, &mut counts, &insertions);
     }
     show_counts(&counts, &pair_names);
-    println!("elapsed: {:?}", now.elapsed());
+    println!("setup: {:?}, calculate: {:?}", setup_t, now.elapsed());
 }
 
-fn polymerise(src: Vec<Count>, insertions: &[(usize, usize)]) -> Vec<Count> {
-    let mut dst = vec![0; src.len()];
+fn polymerise(src: &[Count], dst: &mut [Count], insertions: &[(usize, usize)]) {
+    dst.fill(0);
     for (i, &n) in src.iter().enumerate() {
-        if n > 0 {
-            let (a, b) = insertions[i];
-            dst[a] += n;
-            dst[b] += n;
-        }
+        let (a, b) = insertions[i];
+        dst[a] += n;
+        dst[b] += n;
     }
-    dst
 }
 
 fn show_counts(counts: &[Count], names: &[&str]) {
