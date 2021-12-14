@@ -4,23 +4,23 @@ use std::collections::HashSet;
 type Point = (u32, u32);
 
 fn main() {
-    let mut lines = include_str!("input.txt").lines();
-    let mut points: HashSet<Point> = (&mut lines)
-        .take_while(|line| !line.is_empty())
+    let (point_lines, fold_lines) = include_str!("input.txt").split_once("\n\n").unwrap();
+    let mut points: HashSet<Point> = point_lines
+        .lines()
         .map(|line| {
             let (a, b) = line.split_once(',').unwrap();
             (a.parse().unwrap(), b.parse().unwrap())
         })
         .collect();
 
-    for line in lines {
+    for line in fold_lines.lines() {
         let (axis, amount) = line
             .strip_prefix("fold along ")
             .unwrap()
             .split_once('=')
             .unwrap();
         let amount = amount.parse().unwrap();
-        let deltas: Vec<(Point,Point)> = points
+        let deltas: Vec<(Point, Point)> = points
             .iter()
             .filter_map(|&p| foldp(p, axis, amount))
             .collect();
